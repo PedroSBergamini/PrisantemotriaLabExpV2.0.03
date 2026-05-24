@@ -8,8 +8,12 @@ import { Network, Activity, Filter, Eye, Cpu, BookOpen, Layers } from 'lucide-re
 import { SystemParameters, PhaseSweepPoint } from '../types';
 import { runSimulation } from '../simulator/ode';
 import { evaluateMarkovianFit, findMinimumEmbeddingDimension } from '../simulator/baselines';
+import { useI18n } from '../i18n';
 
 export default function LabCompression() {
+  const { locale } = useI18n();
+  const isEn = locale === 'en-US';
+
   const [params, setParams] = useState<SystemParameters>({
     m: 1.0,
     gamma: 0.15,
@@ -128,7 +132,7 @@ export default function LabCompression() {
             stroke="#1e293b"
             strokeWidth={0.5}
           >
-            <title>Acopl. B={pt.beta} | Mem. T={pt.tauH}s | \u03A6={pt.phi.toFixed(4)} | k*={pt.kStar}</title>
+            <title>{isEn ? `Coupl. B=${pt.beta} | Mem. T=${pt.tauH}s | \u03A6=${pt.phi.toFixed(4)} | k*=${pt.kStar}` : `Acopl. B=${pt.beta} | Mem. T=${pt.tauH}s | \u03A6=${pt.phi.toFixed(4)} | k*=${pt.kStar}`}</title>
           </rect>
         );
       }
@@ -146,18 +150,18 @@ export default function LabCompression() {
         <text x={24} y={30} className="fill-slate-500 text-[8px] font-mono" textAnchor="end">B_max</text>
         <text x={24} y={svgH - 35} className="fill-slate-500 text-[8px] font-mono" textAnchor="end">B_min</text>
         <text x={12} y={svgH / 2} className="fill-zinc-400 text-[9px] font-mono [writing-mode:vertical-lr] origin-center -rotate-180" textAnchor="middle">
-          Acoplamento Histórico (&beta;)
+          {isEn ? 'Historical Coupling (\u03B2)' : 'Acoplamento Histórico (\u03B2)'}
         </text>
 
         {/* Horizontal Axis labels (tauH) */}
         <text x={35} y={svgH - 12} className="fill-slate-500 text-[8px] font-mono">T_min</text>
         <text x={svgW - 45} y={svgH - 12} className="fill-slate-500 text-[8px] font-mono">T_max</text>
         <text x={svgW / 2 + 10} y={svgH - 4} className="fill-zinc-400 text-[9px] font-mono" textAnchor="middle">
-          Tempo de Relaxação (\u03C4_H)
+          {isEn ? 'Relaxation Time (\u03C4_H)' : 'Tempo de Relaxação (\u03C4_H)'}
         </text>
       </svg>
     );
-  }, [phaseSweep]);
+  }, [phaseSweep, isEn]);
 
   // Draw kStar vs tauH projection curve
   const kStarPlotSvg = useMemo(() => {
@@ -205,19 +209,19 @@ export default function LabCompression() {
             fill="#a78bfa"
             className="hover:r-5 cursor-pointer"
           >
-            <title>Tempo={pt.tauH}s | k*={pt.kStar}</title>
+            <title>{isEn ? 'Time' : 'Tempo'}={pt.tauH}s | k*={pt.kStar}</title>
           </circle>
         ))}
 
         <text x={svgW / 2} y={svgH - 4} className="fill-zinc-400 text-[9px] font-mono text-center" textAnchor="middle">
-          Memory characteristics scale \u03C4_H
+          {isEn ? 'Memory decay scale \u03C4_H' : 'Escala de memória \u03C4_H'}
         </text>
         <text x={8} y={15} className="fill-violet-400 text-[8px] font-mono font-bold">
-          [Dimensão de Embedding k*]
+          {isEn ? '[Embedding Dimension k*]' : '[Dimensão de Embedding k*]'}
         </text>
       </svg>
     );
-  }, [kStarCurve, maxOrder]);
+  }, [kStarCurve, maxOrder, isEn]);
 
   return (
     <div className="flex flex-col gap-6" id="compression-tab">
@@ -229,10 +233,20 @@ export default function LabCompression() {
         </div>
         <h2 className="text-sm font-semibold text-slate-100 font-display flex items-center gap-1.5 leading-tight">
           <Layers size={17} className="text-violet-400 animate-pulse" />
-          Módulo de Compressibilidade v1.2 & Análise de Margem Crítica de Memória
+          {isEn 
+            ? 'Compressibility Module v1.2 & Critical Memory Margin Analysis' 
+            : 'Módulo de Compressibilidade v1.2 & Análise de Margem Crítica de Memória'}
         </h2>
         <p className="text-xs text-zinc-300 leading-relaxed max-w-[90%]">
-          <strong>A Pergunta Crucial do Código de Rigor Científico:</strong> Se aumentarmos a dimensão do estado markoviano linear para ordens muito elevadas, o valor de memória explicativo $\Delta F$ colapsa em redundância? No gráfico de embedding $k^*$, medimos exatamente qual é o menor estado representacional markoviano $S' = (S, h_1, h_2, \dots, h_k)$ necessário para compensar o desaparecimento de $\Delta F$ dentro de uma fidelidade de tolerância $\epsilon$.
+          {isEn ? (
+            <>
+              <strong>The Crucial Question of Scientific Rigor:</strong> If we increase the linear Markovian state dimension to extremely high orders, does the explanatory memory field \u0394F collapse into redundancy? In the embedding $k^*$ plot, we measure precisely the smallest linear Markov representation $S\' = (S, h_1, h_2, \dots, h_k)$ required to offset the loss of \u0394F within a precision tolerance threshold \u03B5.
+            </>
+          ) : (
+            <>
+              <strong>A Pergunta Crucial do Código de Rigor Científico:</strong> Se aumentarmos a dimensão do estado markoviano linear para ordens muito elevadas, o valor de memória explicativo $\Delta F$ colapsa em redundância? No gráfico de embedding $k^*$, medimos exatamente qual é o menor estado representacional markoviano $S\' = (S, h_1, h_2, \dots, h_k)$ necessário para compensar o desaparecimento de $\Delta F$ dentro de uma fidelidade de tolerância $\epsilon$.
+            </>
+          )}
         </p>
       </div>
 
@@ -243,13 +257,15 @@ export default function LabCompression() {
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col gap-4" id="compression-settings">
           <div className="flex items-center gap-2 pb-2 border-b border-slate-800">
             <Filter className="text-violet-400" size={17} />
-            <h3 className="text-xs font-bold text-slate-100 font-mono uppercase tracking-wide">Filtros de Compressibilidade</h3>
+            <h3 className="text-xs font-bold text-slate-100 font-mono uppercase tracking-wide">
+              {isEn ? 'Compressibility Filters' : 'Filtros de Compressibilidade'}
+            </h3>
           </div>
 
           {/* Slider for precision epsilon */}
           <div className="flex flex-col gap-1 bg-slate-950 p-3 rounded-lg border border-slate-850">
             <label className="text-xs font-mono text-zinc-300 flex justify-between">
-              <span>Tolerância de Precisão (&epsilon;):</span>
+              <span>{isEn ? 'Precision Tolerance (\u03B5):' : 'Tolerância de Precisão (\u03B5):'}</span>
               <span className="text-cyan-400 font-bold">{epsilon.toExponential(3)}</span>
             </label>
             <input
@@ -263,14 +279,16 @@ export default function LabCompression() {
               className="w-full h-1 bg-slate-800 rounded accent-cyan-400 cursor-pointer"
             />
             <span className="text-[8px] text-zinc-500 leading-normal mt-1 block">
-              *Controla o limite de erro residual aceito para o modelo AR aproximador ser considerado idêntico.
+              {isEn 
+                ? '*Controls the residual error threshold allowed for the approximator AR model to be deemed identical.' 
+                : '*Controla o limite de erro residual aceito para o modelo AR aproximador ser considerado idêntico.'}
             </span>
           </div>
 
           {/* Slider for limits */}
           <div className="flex flex-col gap-1 bg-slate-950 p-3 rounded-lg border border-slate-850 mt-1">
             <label className="text-xs font-mono text-zinc-300 flex justify-between">
-              <span>Limite da Ordem de Ajuste (Max p):</span>
+              <span>{isEn ? 'Max Adjustment Order (Max p):' : 'Limite da Ordem de Ajuste (Max p):'}</span>
               <span className="text-violet-400 font-bold">{maxOrder} lags</span>
             </label>
             <input
@@ -287,16 +305,22 @@ export default function LabCompression() {
 
           <div className="flex flex-col gap-3.5 border-t border-slate-800 pt-3">
             <span className="text-[10px] text-zinc-500 font-mono font-bold uppercase block tracking-wider">
-              Análise de Escala Ótima:
+              {isEn ? 'Optimal Scale Analysis:' : 'Análise de Escala Ótima:'}
             </span>
             <p className="text-[11px] text-zinc-400 leading-relaxed font-sans">
-              O modelo prevê que a historicidade máxima (&Phi; alto) ocorre em tempos de memória equilibrados onde $\tau_H \sim \tau_S$. 
+              {isEn 
+                ? 'The model predicts that maximum historicity (high \u03A6) occurs at balanced memory durations where \u03C4_H ~ \u03C4_S.' 
+                : 'O modelo prevê que a historicidade máxima (\u03A6 alto) ocorre em tempos de memória equilibrados onde $\\tau_H \\sim \\tau_S$.'}
             </p>
             <div className="p-3 bg-violet-950/20 border border-violet-900/30 rounded flex items-center gap-2">
               <Eye className="text-violet-400 shrink-0" size={16} />
               <div className="flex flex-col text-[11px] leading-tight text-violet-300">
-                <span className="font-bold">O Pico / Linha Crítica:</span>
-                <span>Procure os blocos verdes brilhantes no mapa de fase: eles mostram as regiões críticas de pico causal!</span>
+                <span className="font-bold">{isEn ? 'The Causal Peak / Critical Line:' : 'O Pico / Linha Crítica:'}</span>
+                <span>
+                  {isEn 
+                    ? 'Look for bright green tiles in the phase map: they represent critical zones of memory enhancement!' 
+                    : 'Procure os blocos verdes brilhantes no mapa de fase: eles mostram as regiões críticas de pico causal!'}
+                </span>
               </div>
             </div>
           </div>
@@ -305,23 +329,29 @@ export default function LabCompression() {
         {/* Dynamic heatmap phase coordinates */}
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col items-center gap-2" id="phase-heatmap-card">
           <div className="flex justify-between items-center w-full pb-2 border-b border-slate-800">
-            <span className="text-xs font-semibold text-slate-200 font-display">Mapa de Fase Dinâmico &Phi;(&beta;, &tau;_H)</span>
+            <span className="text-xs font-semibold text-slate-200 font-display">
+              {isEn ? 'Dynamic Phase Map \u03A6(\u03B2, \u03C4_H)' : 'Mapa de Fase Dinâmico \u03A6(\u03B2, \u03C4_H)'}
+            </span>
             <span className="text-[9px] text-emerald-400 font-mono px-1.5 py-0.5 rounded bg-emerald-950/40 border border-emerald-900/50 uppercase font-bold">
-              Grid Sweep Real
+              {isEn ? 'Real Grid Sweep' : 'Grid Sweep Real'}
             </span>
           </div>
           <div className="w-[300px] h-[300px] mt-2" id="heatmap-plot-container">
             {phaseHeatmap}
           </div>
           <p className="text-[9px] text-slate-500 font-mono text-center leading-relaxed">
-            *Passe o mouse por cima de cada célula para revelar os dados exatos calculados em tempo de execução.
+            {isEn 
+              ? '*Hover each cell to reveal real calculated data in real-time.' 
+              : '*Passe o mouse por cima de cada célula para revelar os dados exatos calculados em tempo de execução.'}
           </p>
         </div>
 
         {/* Dynamic kStar plot projection lines */}
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col items-center gap-2" id="kstar-plot-card">
           <div className="flex justify-between items-center w-full pb-2 border-b border-slate-800">
-            <span className="text-xs font-semibold text-slate-200 font-display">Irredução: Dimensão Mínima k* vs &tau;_H</span>
+            <span className="text-xs font-semibold text-slate-200 font-display">
+              {isEn ? 'Non-Markovianity: Minimum Embedding k* vs \u03C4_H' : 'Irredução: Dimensão Mínima k* vs \u03C4_H'}
+            </span>
             <span className="text-[9px] text-[#a78bfa] font-mono px-1.5 py-0.5 rounded bg-violet-950/40 border border-violet-900/50 uppercase font-bold">
               k*(Epsilon)
             </span>
@@ -330,7 +360,9 @@ export default function LabCompression() {
             {kStarPlotSvg}
           </div>
           <p className="text-[9px] text-zinc-500 font-mono text-center leading-relaxed">
-            *Conforme $\tau_H$ (tempo de relaxação da memória) atinge a zona crítica, a ordem $k^*$ necessária para Markov mimetizar explode.
+            {isEn 
+              ? '*As the memory relaxation scale \u03C4_H enters the critical region, the order k* required to replicate the memory explodes.' 
+              : '*Conforme \u03C4_H (tempo de relaxação da memória) atinge a zona crítica, a ordem k* necessária para Markov mimetizar explode.'}
           </p>
         </div>
 

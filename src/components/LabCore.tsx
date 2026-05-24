@@ -953,7 +953,7 @@ export default function LabCore({ explorationMode = 'guided', setExplorationMode
       amp,
       freq,
       metrics: computedMetrics
-    });
+    }, locale);
 
     const blob = new Blob([reportStr], { type: 'text/markdown;charset=utf-8;' });
     const url = URL.createObjectURL(blob);

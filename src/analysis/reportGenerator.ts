@@ -29,18 +29,96 @@ export interface ReportData {
  * - technical_report.md (Rigorously academic diagnostics)
  * - human_summary.md (Metaphorical translation)
  */
-export function buildMarkdownReport(data: ReportData): string {
+export function buildMarkdownReport(data: ReportData, locale: 'pt-BR' | 'en-US' = 'pt-BR'): string {
+  const isEn = locale === 'en-US';
   const verdict = generateExperimentalVerdict({
     phi: data.metrics.phi,
     cloneDivergence: data.metrics.cloneDivergence,
     hysteresisArea: data.metrics.hysteresisArea,
     kStar: data.metrics.kStar,
     noiseSurvival: data.metrics.noiseSurvival || 0.84,
-  });
+  }, locale);
 
   const percentConf = (verdict.confidence * 100).toFixed(0);
 
-  return `# PRISANTEMOTRIA LAB REPORT - RUN #${data.runId}
+  if (isEn) {
+    return `# PRISANTEMOTRIA LAB REPORT - RUN #${data.runId}
+Generated at: ${data.timestamp} UTC
+Operator: ${data.userEmail}
+Status of Conclusion: **${verdict.status}** (Confidence of ${percentConf}%)
+
+---
+
+## 1. EXECUTIVE SUMMARY (High-Level Metaphorical Summary)
+
+### **General Verdict:** 
+> **${verdict.summarySentence}**
+> 
+> *${verdict.humanExplanation}*
+
+### **System Dynamics Metaphors:**
+* **Temporal Memory (\u03A6):** ${data.metrics.phi > 0.15 ? 'The system behaves like a person who reads the entire previous chapters of a book before making new decisions, and not just reacting to immediate external shocks.' : 'The system behaves like a short-lived goldfish reacting only to immediate glass reflections.'}
+* **Clone Divergence:** ${data.metrics.cloneDivergence > 0.15 ? 'Two physically identical twins on the present behaving entirely differently after having watched opposite movies in the past.' : 'Two rocks sliding down a slide at the same exact angle pursuing identical trajectories.'}
+
+---
+
+## 2. EXPERIMENTAL CONFIGURATION & PHYSICAL PARAMETERS
+
+| Control Parameter | Physical Value | Meaning in Model v1.0 |
+| :--- | :--- | :--- |
+| **Mass (m)** | ${data.params.m.toFixed(2)} | Mechanical reaction inertia of local state |
+| **Dissipation (\u03B3)** | ${data.params.gamma.toFixed(2)} | Friction and external losses in phase vacuum |
+| **Potential V(S)** | ${data.params.potential.toUpperCase()} | Restoration potential well profile |
+| **Coupling (\u03B2)** | ${data.params.beta.toFixed(2)} | Phase intensity of historical force on instantaneous state |
+| **Relaxation (\u03C4_H)** | ${data.params.tauH.toFixed(2)}s | Relaxation time constant (natural fading memory) |
+| **Transition Impressor (\u03B1)** | ${data.params.alpha.toFixed(2)} | Plastic imprint rate under sharp state change |
+| **Exposure Deposition (\u03B7)** | ${data.params.eta.toFixed(2)} | Habit sedimentation rate under static dwelling |
+
+### **Driving Stimulus E(t):**
+* **Signal Type:** \`${data.stimType.toUpperCase()}\`
+* **Excitation Amplitude:** \`${data.amp.toFixed(2)}\`
+* **Operational Frequency:** \`${data.freq.toFixed(3)} Hz\`
+
+---
+
+## 3. SCIENTIFIC-TECHNICAL REPORT (Laboratory Diagnostics)
+
+### **Quantitative Metric Signatures:**
+
+1. **Autoregressive Efficiency Index (\u03A6):** \`${data.metrics.phi.toFixed(4)}\`
+   * *Scientific Diagnosis:* The memory-augmented model shaved off **${(data.metrics.phi * 100).toFixed(1)}%** of predictive residual variance compared to local linear Markovian AR baseline.
+
+2. **Maximum Causal Divergence (D_max):** \`${data.metrics.cloneDivergence.toFixed(4)}\`
+   * *Scientific Diagnosis:* Post-synchronization state bifurcation proves an irreducible path-dependence trajectory over identical external drivers.
+
+3. **Lag Embedding Dimensional Wrap (k*):** \`k* = ${data.metrics.kStar}\`
+   * *Scientific Diagnosis:* A linear autoregressive embedding of order **${data.metrics.kStar}** is required to approach the power of the coupled exponential visco-elastic field.
+
+4. **Historical Work Done (Hysteresis Loop):** \`${data.metrics.hysteresisArea.toFixed(4)} a.u.\`
+   * *Scientific Diagnosis:* Internal dissipative density demonstrates robust visco-elastic retardation and dynamic latency.
+
+---
+
+## 4. JUDGE COHERENCE CRITERIA VERDICT
+
+The automated statistical jurors verified the following operating criteria during this run:
+
+${verdict.reasons.map((r) => `* **VERIFIED:** ${r}`).join('\n')}
+
+---
+
+## 5. EXPERIMENTAL LIMITATIONS & LESSONS FOR NEXT RUN
+
+1. **Critical Scale Tuning:** ${data.params.tauH > 5 ? 'Relaxation rate tauH is excessively long. Reduce retention to avoid static crystallization of the habit field.' : 'Memory is dissipating too quickly. Try marginally raising tauH to lock dynamic resonance.'}
+2. **Noise Survival:** If the signal is exposed to stochastic perturbations, make sure the beta coupling is strong enough to counter thermodynamic decay.
+3. **Embedding Falsification:** Shift potential setting to \'DOUBLE_WELL\' to verify if bistable regimes provoke sudden explosions in k* embedding paths.
+
+---
+**P.R.I.S.A.N.T.E.M.O.T.R.I.A   L.A.B   v2.0   --   M.A.T.H.E.M.A.T.I.C.S   D.I.S.C.O.V.E.R.S,   I.N.T.E.R.F.A.C.E   T.R.A.N.S.L.A.T.E.S.**
+`;
+  }
+
+  return `# RELATÓRIO DE LABORATÓRIO PRISANTEMOTRIA - RUN #${data.runId}
 Gerado em: ${data.timestamp} UTC
 Operador: ${data.userEmail}
 Status de Conclusão: **${verdict.status}** (Confiança de ${percentConf}%)
@@ -98,6 +176,7 @@ Status de Conclusão: **${verdict.status}** (Confiança de ${percentConf}%)
 ---
 
 ## 4. VEREDITO & JUSTIFICATIVA DOS JUÍZES AUTOMÁTICOS
+
 Os árbitros de coerência estatística identificaram os seguintes critérios operantes nesta rodada:
 
 ${verdict.reasons.map((r) => `* **VERIFICADO:** ${r}`).join('\n')}

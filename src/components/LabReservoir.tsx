@@ -8,8 +8,12 @@ import { Cpu, RefreshCw, Layers, Server, Activity, HelpCircle } from 'lucide-rea
 import { SystemParameters, StimulusType } from '../types';
 import { runSimulation } from '../simulator/ode';
 import { EchoStateNetwork } from '../simulator/esn';
+import { useI18n } from '../i18n';
 
 export default function LabReservoir() {
+  const { locale } = useI18n();
+  const isEn = locale === 'en-US';
+
   // Model Parameters for Coupled System S <-> \Delta F
   const [params, setParams] = useState<SystemParameters>({
     m: 1.0,
@@ -100,13 +104,13 @@ export default function LabReservoir() {
 
         <g transform={`translate(${rW - 170}, 15)`} className="text-[9px] font-mono fill-zinc-300">
           <circle cx={5} cy={-2} r={3} fill="#f1f5f9" fillOpacity={0.8} />
-          <text x={12} y={1}>S Real (Simulado)</text>
+          <text x={12} y={1}>{isEn ? 'S Real (Simulated)' : 'S Real (Simulado)'}</text>
 
           <circle cx={5} cy={10} r={3} fill="#06b6d4" />
-          <text x={12} y={13}>Previsão ESN (Reservoir)</text>
+          <text x={12} y={13}>{isEn ? 'ESN Forecast (Reservoir)' : 'Previsão ESN (Reservoir)'}</text>
           
           <line x1={0} y1={22} x2={10} y2={22} stroke="#06b6d4" strokeWidth={1.5} strokeDasharray="2 2" />
-          <text x={12} y={25}>Índice Escolhido t={inspectT.toFixed(2)}s</text>
+          <text x={12} y={25}>{isEn ? `Chosen Index t=${inspectT.toFixed(2)}s` : `Índice Escolhido t=${inspectT.toFixed(2)}s`}</text>
         </g>
       </svg>
     );
@@ -191,7 +195,7 @@ export default function LabReservoir() {
     return (
       <div className="flex flex-col items-center justify-center p-4 bg-slate-950 border border-slate-850 rounded-lg">
         <span className="font-mono text-[10px] text-zinc-400 block mb-2 font-bold flex items-center gap-1.5 self-start uppercase">
-          <Activity size={12} className="text-cyan-400" /> Ativações de Neurônios do Reservatório
+          <Activity size={12} className="text-cyan-400" /> {isEn ? 'Reservoir Neuron Activations' : 'Ativações de Neurônios do Reservatório'}
         </span>
         <div className="relative">
           <svg width={sizeGraph} height={sizeGraph}>
@@ -202,16 +206,16 @@ export default function LabReservoir() {
         <div className="flex gap-4 justify-center items-center text-[9px] mt-1 font-mono text-zinc-400">
           <div className="flex items-center gap-1">
             <span className="w-2.5 h-2.5 rounded-full bg-cyan-500 block" />
-            <span>Ativação Positiva (+)</span>
+            <span>{isEn ? 'Positive Activation (+)' : 'Ativação Positiva (+)'}</span>
           </div>
           <div className="flex items-center gap-1">
             <span className="w-2.5 h-2.5 rounded-full bg-red-500 block" />
-            <span>Ativação Negativa (-)</span>
+            <span>{isEn ? 'Negative Activation (-)' : 'Ativação Negativa (-)'}</span>
           </div>
         </div>
       </div>
     );
-  }, [esnSize, states, safeInspectIdx]);
+  }, [esnSize, states, safeInspectIdx, isEn]);
 
   return (
     <div className="flex flex-col gap-6" id="reservoir-tab">
@@ -224,13 +228,17 @@ export default function LabReservoir() {
             <Layers size={40} className="opacity-15" />
           </div>
           <div>
-            <span className="text-[10px] text-zinc-400 font-mono uppercase tracking-wide">Erro Quadrático Médio ESN (MSE)</span>
+            <span className="text-[10px] text-zinc-400 font-mono uppercase tracking-wide">
+              {isEn ? 'ESN Mean Squared Error (MSE)' : 'Erro Quadrático Médio ESN (MSE)'}
+            </span>
             <h3 className="text-3xl font-extrabold text-cyan-400 font-display mt-1">
               {mse.toExponential(5)}
             </h3>
           </div>
           <p className="text-xs text-zinc-300 mt-2">
-            Medida de precisão com que o reservatório de {esnSize} nós mimetiza a dinâmica não-markoviana com acoplamento histórico.
+            {isEn 
+              ? `Precision measure with which the reservoir of ${esnSize} nodes mimics non-Markovian dynamics with historical coupling.`
+              : `Medida de precisão com que o reservatório de ${esnSize} nós mimetiza a dinâmica não-markoviana com acoplamento histórico.`}
           </p>
         </div>
 
@@ -239,13 +247,17 @@ export default function LabReservoir() {
             <Server size={40} className="opacity-15" />
           </div>
           <div>
-            <span className="text-[10px] text-zinc-400 font-mono uppercase tracking-wide">Dimensão do Reservatório Recorrente</span>
+            <span className="text-[10px] text-zinc-400 font-mono uppercase tracking-wide">
+              {isEn ? 'Recurrent Reservoir Size' : 'Dimensão do Reservatório Recorrente'}
+            </span>
             <h3 className="text-3xl font-extrabold text-[#38bdf8] font-display mt-1">
               N_R = {esnSize}
             </h3>
           </div>
           <p className="text-xs text-zinc-300 mt-2">
-            Representa {esnSize} graus de liberdade recorrentes artificiais sintonizados pela constante de relaxamento temporal.
+            {isEn 
+              ? `Represents ${esnSize} recurrent artificial degrees of freedom tuned by the temporal relaxation constant.`
+              : `Representa ${esnSize} graus de liberdade recorrentes artificiais sintonizados pela constante de relaxamento temporal.`}
           </p>
         </div>
 
@@ -254,13 +266,17 @@ export default function LabReservoir() {
             <Cpu size={40} className="opacity-15" />
           </div>
           <div>
-            <span className="text-[10px] text-zinc-400 font-mono uppercase tracking-wide">Raio Espectral (&rho;) & Escoamento</span>
+            <span className="text-[10px] text-zinc-400 font-mono uppercase tracking-wide">
+              {isEn ? 'Spectral Radius (\u03C1) & Leakage (L)' : 'Raio Espectral (\u03C1) & Escoamento'}
+            </span>
             <h3 className="text-3xl font-extrabold text-violet-400 font-display mt-1">
               &rho; = {spectralRadius} | L = {leakage}
             </h3>
           </div>
           <p className="text-xs text-zinc-300 mt-2">
-            Condiciona as escalas de atenuação das ondas internas de ativação pós-estímulo no lago neural.
+            {isEn 
+              ? 'Determines the damping rates of internal activations post-stimulus inside the neural network.'
+              : 'Condiciona as escalas de atenuação das ondas internas de ativação pós-estímulo no lago neural.'}
           </p>
         </div>
 
@@ -272,18 +288,23 @@ export default function LabReservoir() {
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col gap-4 mx-0" id="esn-sliders-card">
           <div className="flex items-center gap-2 pb-2 border-b border-slate-800">
             <Cpu className="text-cyan-400" size={17} />
-            <h2 className="text-sm font-semibold text-slate-100 font-display">Parâmetros do Reservatório</h2>
+            <h2 className="text-sm font-semibold text-slate-100 font-display">
+              {isEn ? 'Reservoir Parameters' : 'Parâmetros do Reservatório'}
+            </h2>
           </div>
 
           <div className="text-xs text-zinc-300 leading-relaxed bg-slate-950 p-3 rounded border border-slate-850">
-            <strong>Reservoir Computing:</strong> Redes de estado de eco (ESN) fornecem uma representação de memória analógica distribuída ideal para mimetizar variáveis termodinâmicas ou viscoelásticas acopladas ($\Delta F$).
+            <strong>Reservoir Computing:</strong>{' '}
+            {isEn 
+              ? 'Echo State Networks (ESN) provide a distributed analog memory representation ideal for mimicking coupled viscoelastic or thermodynamic variables (\u0394F).'
+              : 'Redes de estado de eco (ESN) fornecem uma representação de memória analógica distribuída ideal para mimetizar variáveis termodinâmicas ou viscoelásticas acopladas (\u0394F).'}
           </div>
 
           <div className="flex flex-col gap-3.5 mt-2">
             {/* Slider for esnSize */}
             <div className="flex flex-col gap-1 text-xs">
               <div className="flex justify-between font-mono text-slate-400">
-                <span>Neurônios no Reservatório (N_R)</span>
+                <span>{isEn ? 'Neurons in Reservoir (N_R)' : 'Neurônios no Reservatório (N_R)'}</span>
                 <span className="text-cyan-400 font-bold">{esnSize}</span>
               </div>
               <input
@@ -301,7 +322,7 @@ export default function LabReservoir() {
             {/* Slider for spectral radius */}
             <div className="flex flex-col gap-1 text-xs">
               <div className="flex justify-between font-mono text-slate-400">
-                <span>Raio Espectral Estimado (&rho;)</span>
+                <span>{isEn ? 'Estimated Spectral Radius (\u03C1)' : 'Raio Espectral Estimado (\u03C1)'}</span>
                 <span className="text-cyan-400 font-bold">{spectralRadius}</span>
               </div>
               <input
@@ -319,7 +340,7 @@ export default function LabReservoir() {
             {/* Slider for leakage */}
             <div className="flex flex-col gap-1 text-xs">
               <div className="flex justify-between font-mono text-slate-400">
-                <span>Taxa de Escoamento / Leakage (L)</span>
+                <span>{isEn ? 'Leakage Rate (L)' : 'Taxa de Escoamento / Leakage (L)'}</span>
                 <span className="text-cyan-400 font-bold">{leakage}</span>
               </div>
               <input
@@ -338,10 +359,10 @@ export default function LabReservoir() {
           {/* Time Scrubber */}
           <div className="bg-slate-950 p-3 rounded-lg border border-slate-850 flex flex-col gap-2 mt-2">
             <span className="text-[10px] text-zinc-400 font-mono uppercase font-bold tracking-wider">
-              Navegar no tempo (Simulação):
+              {isEn ? 'Navigate time scrubber (Simulation):' : 'Navegar no tempo (Simulação):'}
             </span>
             <div className="flex justify-between font-mono text-[10px] text-zinc-400">
-              <span>passo: {safeInspectIdx}</span>
+              <span>{isEn ? 'step:' : 'passo:'} {safeInspectIdx}</span>
               <span>t: {(safeInspectIdx * 0.05).toFixed(2)}s</span>
             </div>
             <input
@@ -354,7 +375,9 @@ export default function LabReservoir() {
               className="w-full h-1 bg-slate-805 rounded accent-cyan-400 cursor-pointer"
             />
             <span className="text-[8px] text-zinc-500 leading-tight">
-              *Mova o scrubber para inspecionar as flutuações das cargas neuronais à direita.
+              {isEn 
+                ? '*Move the scrubber to inspect neural state charges on the right.' 
+                : '*Mova o scrubber para inspecionar as flutuações das cargas neuronais à direita.'}
             </span>
           </div>
 
@@ -364,7 +387,9 @@ export default function LabReservoir() {
         <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4" id="esn-charts-panel">
           
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between gap-3 md:col-span-2">
-            <span className="text-xs font-semibold text-slate-200 font-display">Previsão Dinâmica por Computação de Reservatório</span>
+            <span className="text-xs font-semibold text-slate-200 font-display">
+              {isEn ? 'Dynamic Forecast via Reservoir Computing' : 'Previsão Dinâmica por Computação de Reservatório'}
+            </span>
             <div className="h-[170px] w-full" id="esn-predictions-chart-container">
               {predictionChart}
             </div>
@@ -397,7 +422,9 @@ export default function LabReservoir() {
               })}
               {readoutWeights.length > 16 && (
                 <div className="text-[9px] text-zinc-500 font-mono uppercase text-center py-1 font-semibold">
-                  + {readoutWeights.length - 16} outros pesos readouts omitidos
+                  {isEn 
+                    ? `+ ${readoutWeights.length - 16} other output weights omitted` 
+                    : `+ ${readoutWeights.length - 16} outros pesos readouts omitidos`}
                 </div>
               )}
             </div>
