@@ -1,0 +1,8 @@
+{
+  "name": " Prisantemotria Lab v2.0.02",
+  "description": "Laboratório Explicativo e Experimental de Validação da Teoria da Historicidade Dinâmica e Compressibilidade de Memória Prisantemotria V1.0 - V2.0.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
