@@ -4,6 +4,7 @@
  */
 
 import { SystemParameters, SimulationPoint, PotentialType, StimulusType } from '../types';
+import { x_ext, StimulusConfig } from './stimulus';
 
 // Compute Potential V(S)
 export function getPotentialEnergy(S: number, par: SystemParameters): number {
@@ -37,39 +38,56 @@ export function getPotentialForce(S: number, par: SystemParameters): number {
 }
 
 // Generate stimulus E(t)
-export function getStimulus(t: number, type: StimulusType, amplitude: number, frequency: number): number {
+export function getStimulus(
+  t: number,
+  type: StimulusType,
+  amplitude: number,
+  frequency: number,
+  startOffset?: number,
+  duration?: number,
+  stimConfig?: StimulusConfig
+): number {
+  if (stimConfig) {
+    return x_ext(t, {
+      ...stimConfig,
+      type: (stimConfig.type === 'step' || stimConfig.type === 'noise') ? 'sine' : (stimConfig.type as any), // Safeguard type check
+      amp: amplitude,
+      freq: frequency,
+      startOffset: startOffset !== undefined ? startOffset : stimConfig.startOffset,
+      duration: duration !== undefined ? duration : stimConfig.duration,
+    });
+  }
   switch (type) {
     case 'sine':
-      return amplitude * Math.sin(2 * Math.PI * frequency * t);
-    case 'pulse': {
-      // Periodic rectangular pulses
-      const period = 1 / (frequency || 0.1);
-      const mod = t % period;
-      return mod < period * 0.2 ? amplitude : 0;
-    }
-    case 'chirp': {
-      // Linearly increasing frequency over time (good for testing non-Markovian resonance)
-      const k = 0.05; // frequency sweep-rate
-      const instantFreq = frequency + k * t;
-      return amplitude * Math.sin(2 * Math.PI * instantFreq * t);
-    }
+      return x_ext(t, { type: 'sine', amp: amplitude, freq: frequency, startOffset, duration });
+    case 'pulse':
+      return x_ext(t, { type: 'pulse', amp: amplitude, freq: frequency, dutyCycle: 0.2, startOffset, duration });
+    case 'chirp':
+      return x_ext(t, { type: 'chirp', amp: amplitude, freq: frequency, startOffset, duration });
     case 'bistable': {
       // Alternating step pulses
+      if (startOffset !== undefined && t < startOffset) return 0;
+      if (startOffset !== undefined && duration !== undefined && t > startOffset + duration) return 0;
       const period = 1 / (frequency || 0.1);
-      const phase = (t % period) / period;
+      const T = startOffset !== undefined ? t - startOffset : t;
+      const phase = (T % period) / period;
       if (phase < 0.4) return amplitude;
       if (phase >= 0.5 && phase < 0.9) return -amplitude;
       return 0;
     }
     case 'thermal_noise': {
-      // Simulated bandwidth-limited noise using sinusoidal superposition (deterministic for smooth solver lines)
+      // Simulated bandwidth-limited noise using sinusoidal superposition
+      if (startOffset !== undefined && t < startOffset) return 0;
+      if (startOffset !== undefined && duration !== undefined && t > startOffset + duration) return 0;
+      const T = startOffset !== undefined ? t - startOffset : t;
       let noise = 0;
       for (let i = 1; i <= 5; i++) {
-        noise += Math.sin(1.7 * i * t + Math.cos(2.3 * i * t)) * (1 / i);
+        noise += Math.sin(1.7 * i * T + Math.cos(2.3 * i * T)) * (1 / i);
       }
       return (amplitude / 2) * noise;
     }
   }
+  return 0;
 }
 
 // ODE derivatives function f(Y, t)
@@ -81,10 +99,13 @@ function derivatives(
   par: SystemParameters,
   stimType: StimulusType,
   amp: number,
-  freq: number
+  freq: number,
+  startOffset?: number,
+  duration?: number,
+  stimConfig?: StimulusConfig
 ): [number, number, number] {
   const [S, dS, dF] = Y;
-  const E = getStimulus(t, stimType, amp, freq);
+  const E = getStimulus(t, stimType, amp, freq, startOffset, duration, stimConfig);
 
   // dS/dt = dS
   const dydt_0 = dS;
@@ -108,30 +129,33 @@ export function rk4Step(
   par: SystemParameters,
   stimType: StimulusType,
   amp: number,
-  freq: number
+  freq: number,
+  startOffset?: number,
+  duration?: number,
+  stimConfig?: StimulusConfig
 ): [number, number, number] {
-  const k1 = derivatives(t, Y, par, stimType, amp, freq);
+  const k1 = derivatives(t, Y, par, stimType, amp, freq, startOffset, duration, stimConfig);
 
   const Y_k2: [number, number, number] = [
     Y[0] + 0.5 * dt * k1[0],
     Y[1] + 0.5 * dt * k1[1],
     Y[2] + 0.5 * dt * k1[2],
   ];
-  const k2 = derivatives(t + 0.5 * dt, Y_k2, par, stimType, amp, freq);
+  const k2 = derivatives(t + 0.5 * dt, Y_k2, par, stimType, amp, freq, startOffset, duration, stimConfig);
 
   const Y_k3: [number, number, number] = [
     Y[0] + 0.5 * dt * k2[0],
     Y[1] + 0.5 * dt * k2[1],
     Y[2] + 0.5 * dt * k2[2],
   ];
-  const k3 = derivatives(t + 0.5 * dt, Y_k3, par, stimType, amp, freq);
+  const k3 = derivatives(t + 0.5 * dt, Y_k3, par, stimType, amp, freq, startOffset, duration, stimConfig);
 
   const Y_k4: [number, number, number] = [
     Y[0] + dt * k3[0],
     Y[1] + dt * k3[1],
     Y[2] + dt * k3[2],
   ];
-  const k4 = derivatives(t + dt, Y_k4, par, stimType, amp, freq);
+  const k4 = derivatives(t + dt, Y_k4, par, stimType, amp, freq, startOffset, duration, stimConfig);
 
   return [
     Y[0] + (dt / 6) * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0]),
@@ -148,7 +172,10 @@ export function runSimulation(
   freq: number,
   duration: number = 30,
   dt: number = 0.05,
-  initialY: [number, number, number] = [0, 0, 0]
+  initialY: [number, number, number] = [0, 0, 0],
+  startOffset?: number,
+  stimDuration?: number,
+  stimConfig?: StimulusConfig
 ): SimulationPoint[] {
   const steps = Math.floor(duration / dt);
   const data: SimulationPoint[] = [];
@@ -161,7 +188,7 @@ export function runSimulation(
     const dS = Y[1];
     const dF = Y[2];
 
-    const E = getStimulus(t, stimType, amp, freq);
+    const E = getStimulus(t, stimType, amp, freq, startOffset, stimDuration, stimConfig);
     const V_S = getPotentialEnergy(S, par);
 
     // Calculate Hamiltonian / Energies
@@ -187,7 +214,7 @@ export function runSimulation(
     });
 
     // Advance
-    Y = rk4Step(t, dt, Y, par, stimType, amp, freq);
+    Y = rk4Step(t, dt, Y, par, stimType, amp, freq, startOffset, stimDuration, stimConfig);
     t += dt;
   }
 
@@ -202,7 +229,10 @@ export function runCloneTest(
   freq: number,
   historyADrivingFreq: number,
   historyBDrivingFreq: number,
-  dt: number = 0.05
+  dt: number = 0.05,
+  startOffset?: number,
+  duration?: number,
+  stimConfig?: StimulusConfig
 ): {
   timeSeries: Array<{
     t: number;
@@ -218,8 +248,8 @@ export function runCloneTest(
 } {
   // Step 1: Pre-run distinct history A and B with different driving frequencies to prime non-identical memory
   const historyDur = 20;
-  const simA = runSimulation(par, stimType, amp, historyADrivingFreq, historyDur, dt);
-  const simB = runSimulation(par, stimType, amp, historyBDrivingFreq, historyDur, dt);
+  const simA = runSimulation(par, stimType, amp, historyADrivingFreq, historyDur, dt, [0, 0, 0], startOffset, duration, stimConfig);
+  const simB = runSimulation(par, stimType, amp, historyBDrivingFreq, historyDur, dt, [0, 0, 0], startOffset, duration, stimConfig);
 
   // Extract final state at t = historyDur
   // We synchronize the INSTANTANEOUS physical state (S_A, dS_A) = (S_B, dS_B)
@@ -244,7 +274,7 @@ export function runCloneTest(
   let t = 0;
 
   for (let k = 0; k < steps; k++) {
-    const E = getStimulus(t, stimType, amp, freq); // Common future stimulus
+    const E = getStimulus(t, stimType, amp, freq, startOffset, duration, stimConfig); // Common future stimulus
     const div = Math.abs(Y_A[0] - Y_B[0]);
 
     timeSeries.push({
@@ -258,8 +288,8 @@ export function runCloneTest(
     });
 
     // Advance both separately with identical parameters, under same common future stimulus
-    Y_A = rk4Step(t, dt, Y_A, par, stimType, amp, freq);
-    Y_B = rk4Step(t, dt, Y_B, par, stimType, amp, freq);
+    Y_A = rk4Step(t, dt, Y_A, par, stimType, amp, freq, startOffset, duration, stimConfig);
+    Y_B = rk4Step(t, dt, Y_B, par, stimType, amp, freq, startOffset, duration, stimConfig);
     t += dt;
   }
 

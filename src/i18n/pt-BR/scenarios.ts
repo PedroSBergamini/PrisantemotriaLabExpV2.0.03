@@ -161,5 +161,70 @@ export const scenarios: DictScenario[] = [
       'Analise se o índice de sobrevivência sob ruído (R) racha sob desordem browniana'
     ],
     expectedSignature: 'R_idx baixo, Sincronia térmica desfeita'
+  },
+  {
+    id: 13,
+    tier: 5,
+    tierTitle: 'Tier 5: Sinais v2 [NOVO]',
+    title: 'Envelope de Habituação (ADSR)',
+    description: 'Modula o sinal por meio de envelopes transientes de Ataque, Decaimento, Sustentação e Liberação (ADSR) para verificar a atenuação de novos hábitos.',
+    checklist: [
+      'Selecione o driver Senoidal e configure os tempos ADSR no painel',
+      'Observe os acúmulos progressivos e o corte abrupto de sustentação',
+      'Identifique se o atraso residual dF sobrevive ao silêncio pós-release'
+    ],
+    expectedSignature: 'Φ ≈ 12.0%, Sobrevivência Pós-Release'
+  },
+  {
+    id: 14,
+    tier: 5,
+    tierTitle: 'Tier 5: Sinais v2 [NOVO]',
+    title: 'Efetuador de Batimento AM',
+    description: 'Analisa batimentos lentos de modulação de amplitude (AM) para testar se a escala de memória reage às pulsações de flutuação cíclica.',
+    checklist: [
+      'Ative a modulação AM com uma frequência de batimento lenta',
+      'Monitore os picos e vales das deformações acumuladas no oscilador',
+      'Estude a deformação assimétrica e o atraso fásico em baixas amplitudes'
+    ],
+    expectedSignature: 'Φ ≈ 10.0%, Histerese Modulada'
+  },
+  {
+    id: 15,
+    tier: 5,
+    tierTitle: 'Tier 5: Sinais v2 [NOVO]',
+    title: 'Dispersão de Ressonância (FM)',
+    description: 'Muda a frequência do estímulo sob modulação FM para estressar a memória de amortecimento clássica frente a rápidas defasagens.',
+    checklist: [
+      'Sintonize a modulação de frequência (FM) com profundidade média',
+      'Assista aos picos de transição de fase quando o driver ganha celeridade',
+      'Mensure a perda ou reorganização instantânea de ordem e ressonância'
+    ],
+    expectedSignature: 'Caos Intermitente, Baixo R_idx'
+  },
+  {
+    id: 16,
+    tier: 5,
+    tierTitle: 'Tier 5: Sinais v2 [NOVO]',
+    title: 'Sobrevivência sob Ruído Rosa',
+    description: 'Submete a dinâmica restaurativa de hábitos a perturbações decorrelacionadas flutuantes (1/f) para comprovar a blindagem seletiva de caminhos.',
+    checklist: [
+      'Ative a excitação de Ruído com perfil de cor Rosa (Pink Noise)',
+      'Veja se a entropia fractária do ruído degrada a atração fásica local',
+      'Estime se a barreira de potencial duplo dissipa a persistência habitual'
+    ],
+    expectedSignature: 'Φ Resistente (> 5.0%), Alta Retenção'
+  },
+  {
+    id: 17,
+    tier: 5,
+    tierTitle: 'Tier 5: Sinais v2 [NOVO]',
+    title: 'Treinamento de Pulso Fantasma',
+    description: 'Aplica estímulos trapezoidais curtos e precisos com startOffset para comprovar e medir o efeito fantasma indubitável de oscilação amortecida pós-choque.',
+    checklist: [
+      'Configure um sinal de Pulso único com rampa trapezoidal de subida e descida',
+      'Observe o soco inicial transferindo momento e deformando o espaço dF',
+      'Analise a oscilação livre pós-choque provando a persistência estrutural H_t'
+    ],
+    expectedSignature: 'Divergência Irredutível, Efeito Fantasma'
   }
 ];

@@ -161,5 +161,70 @@ export const scenarios: DictScenario[] = [
       'Measure if the noise survival index (R_idx) collapses under randomness'
     ],
     expectedSignature: 'Low R_idx, Thermal separation'
+  },
+  {
+    id: 13,
+    tier: 5,
+    tierTitle: 'Tier 5: v2 Signals [NEW]',
+    title: 'Habituation Envelope (ADSR)',
+    description: 'Modulate the signal source with dynamic Attack, Decay, Sustain, and Release (ADSR) transient phases to analyze restorative habit decays.',
+    checklist: [
+      'Select a Sine driver and configure custom ADSR parameter sliders on the panel',
+      'Observe the progressive amplitude buildup and the abrupt sustain cutoff',
+      'Track if the residual delay memory dF outlasts the silent post-release zone'
+    ],
+    expectedSignature: 'Φ ≈ 12.0%, Post-Release Preservation'
+  },
+  {
+    id: 14,
+    tier: 5,
+    tierTitle: 'Tier 5: v2 Signals [NEW]',
+    title: 'AM Beat Effector',
+    description: 'Examines slow Amplitude Modulation (AM) beats to test if the historical channel tracks slow envelope fluctuations.',
+    checklist: [
+      'Enable Amplitude Modulation (AM) with a slow beating frequency',
+      'Monitor the peaks and valleys of accumulated memory in the phase space',
+      'Analyze asymmetric warping and phase lagging under low-amplitude cycles'
+    ],
+    expectedSignature: 'Φ ≈ 10.0%, Modulated Hysteresis'
+  },
+  {
+    id: 15,
+    tier: 5,
+    tierTitle: 'Tier 5: v2 Signals [NEW]',
+    title: 'FM Resonance Dispersion',
+    description: 'Modulates internal driving frequencies via FM to stress-test historical elastic feedback loops under dynamic phase shifts.',
+    checklist: [
+      'Tune Frequency Modulation (FM) with moderate frequency deviation depth',
+      'Watch phase transition peaks as the driving force quickly accelerates',
+      'Measure instantaneous reorganization of mechanical order and resonance dynamics'
+    ],
+    expectedSignature: 'Intermittent Chaos, Low R_idx'
+  },
+  {
+    id: 16,
+    tier: 5,
+    tierTitle: 'Tier 5: v2 Signals [NEW]',
+    title: 'Pink Noise Survival',
+    description: 'Exposes habit structures to fractal 1/f noise signals to evaluate structural lane protection against power roll-offs.',
+    checklist: [
+      'Set driver type to Noise and select the Pink color option',
+      'Observe if fractal entropy decays local phase attraction bounds',
+      'Estimate whether double-potential barriers protect viscoelastic traces'
+    ],
+    expectedSignature: 'Resilient Φ (> 5.0%), High Retention'
+  },
+  {
+    id: 17,
+    tier: 5,
+    tierTitle: 'Tier 5: v2 Signals [NEW]',
+    title: 'Ghost Pulse Training',
+    description: 'Applies finite, trapezoidal pulses with configurable start offsets to prove the presence of mechanical ghost responses.',
+    checklist: [
+      'Set single Pulse driving with trapezoidal rise and fall times',
+      'Watch the initial strike deliver momentum and deform history dF space',
+      'Observe the unforced free oscillation following the pulse to prove persistent H_t memory'
+    ],
+    expectedSignature: 'Irreducible Divergence, Ghost Effect'
   }
 ];

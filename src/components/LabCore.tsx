@@ -351,6 +351,99 @@ const COGNITIVE_SCENARIOS = [
     stimType: 'thermal_noise' as const, amp: 1.5, freq: 0.15,
     focusKeys: ["noise_robustness", "gamma"],
     expectedSignature: "R_idx baixo, Sincronia térmica desfeita"
+  },
+  {
+    id: 13,
+    tier: 5,
+    tierTitle: "Tier 5: Sinais v2 [NOVO]",
+    title: "Envelope de Habituação (ADSR)",
+    description: "Modula o sinal por meio de envelopes transientes de Ataque, Decaimento, Sustentação e Liberação (ADSR) para verificar a atenuação de novos hábitos.",
+    checklist: [
+      "Selecione o driver Senoidal e configure os tempos ADSR no painel",
+      "Observe os acúmulos progressivos e o corte abrupto de sustentação",
+      "Identifique se o atraso residual dF sobrevive ao silêncio pós-release"
+    ],
+    presetParams: { m: 1.0, gamma: 0.25, potential: 'harmonic' as const, beta: 1.0, tauH: 3.5, alpha: 0.5, eta: 0.3, V_height: 0.5 },
+    stimType: 'sine' as const, amp: 1.2, freq: 0.12,
+    stimStartOffset: 2.0,
+    stimDuration: 15.0,
+    focusKeys: ["beta", "tauH"],
+    expectedSignature: "Φ ≈ 12.0%, Sobrevivência Pós-Release",
+    stimConfig: { type: 'sine' as const, amp: 1.2, freq: 0.12, startOffset: 2.0, duration: 15.0, attack: 2.0, decay: 3.0, sustain: 0.6, release: 4.0 }
+  },
+  {
+    id: 14,
+    tier: 5,
+    tierTitle: "Tier 5: Sinais v2 [NOVO]",
+    title: "Efetuador de Batimento AM",
+    description: "Analisa batimentos lentos de modulação de amplitude (AM) para testar se a escala de memória reage às pulsações de flutuação cíclica.",
+    checklist: [
+      "Ative a modulação AM com uma frequência de batimento lenta",
+      "Monitore os picos e vales das deformações acumuladas no oscilador",
+      "Estude a deformação assimétrica e o atraso fásico em baixas amplitudes"
+    ],
+    presetParams: { m: 1.0, gamma: 0.2, potential: 'harmonic' as const, beta: 1.2, tauH: 4.0, alpha: 0.6, eta: 0.2, V_height: 0.5 },
+    stimType: 'sine' as const, amp: 1.5, freq: 0.4,
+    stimStartOffset: 1.0,
+    stimDuration: 28.0,
+    focusKeys: ["beta", "tauH"],
+    expectedSignature: "Φ ≈ 10.0%, Histerese Modulada",
+    stimConfig: { type: 'sine' as const, amp: 1.5, freq: 0.4, startOffset: 1.0, duration: 28.0, amFreq: 0.05, amDepth: 0.8 }
+  },
+  {
+    id: 15,
+    tier: 5,
+    tierTitle: "Tier 5: Sinais v2 [NOVO]",
+    title: "Dispersão de Ressonância (FM)",
+    description: "Muda a frequência do estímulo sob modulação FM para estressar a memória de amortecimento clássica frente a rápidas defasagens.",
+    checklist: [
+      "Sintonize a modulação de frequência (FM) com profundidade média",
+      "Assista aos picos de transição de phase quando o driver ganha celeridade",
+      "Mensure a perda ou reorganização instantânea de ordem e ressonância"
+    ],
+    presetParams: { m: 1.0, gamma: 0.15, potential: 'double_well' as const, beta: 1.3, tauH: 3.0, alpha: 0.8, eta: 0.3, V_height: 0.6 },
+    stimType: 'sine' as const, amp: 1.2, freq: 0.2,
+    stimStartOffset: 1.0,
+    stimDuration: 28.0,
+    focusKeys: ["beta", "gamma"],
+    expectedSignature: "Caos Intermitente, Baixo R_idx",
+    stimConfig: { type: 'sine' as const, amp: 1.2, freq: 0.2, startOffset: 1.0, duration: 28.0, fmFreq: 0.04, fmDepth: 0.15 }
+  },
+  {
+    id: 16,
+    tier: 5,
+    tierTitle: "Tier 5: Sinais v2 [NOVO]",
+    title: "Sobrevivência sob Ruído Rosa",
+    description: "Submete a dinâmica restaurativa de hábitos a perturbações decorrelacionadas flutuantes (1/f) para comprovar a blindagem seletiva de caminhos.",
+    checklist: [
+      "Ative a excitação de Ruído com perfil de cor Rosa (Pink Noise)",
+      "Veja se a entropia fractária do ruído degrada a atração fásica local",
+      "Estime se a barreira de potencial duplo dissipa a persistência habitual"
+    ],
+    presetParams: { m: 1.0, gamma: 0.3, potential: 'double_well' as const, beta: 1.1, tauH: 4.0, alpha: 0.7, eta: 0.2, V_height: 0.6 },
+    stimType: 'thermal_noise' as const, amp: 1.5, freq: 0.1,
+    focusKeys: ["noise_robustness", "beta"],
+    expectedSignature: "Φ Resistente (> 5.0%), Alta Retenção",
+    stimConfig: { type: 'noise' as const, amp: 1.5, freq: 0.1, startOffset: 1.0, duration: 28.0, noiseColor: 'pink' }
+  },
+  {
+    id: 17,
+    tier: 5,
+    tierTitle: "Tier 5: Sinais v2 [NOVO]",
+    title: "Treinamento de Pulso Fantasma",
+    description: "Aplica estímulos trapezoidais curtos e precisos com startOffset para comprovar e medir o efeito fantasma indubitável de oscilação amortecida pós-choque.",
+    checklist: [
+      "Configure um sinal de Pulso único com rampa trapezoidal de subida e descida",
+      "Observe o soco inicial transferindo momento e deformando o espaço dF",
+      "Analise a oscilação livre pós-choque provando a persistência estrutural H_t"
+    ],
+    presetParams: { m: 1.0, gamma: 0.1, potential: 'double_well' as const, beta: 1.5, tauH: 5.0, alpha: 1.2, eta: 0.4, V_height: 0.7 },
+    stimType: 'pulse' as const, amp: 2.0, freq: 0.05,
+    stimStartOffset: 4.0,
+    stimDuration: 3.0,
+    focusKeys: ["beta", "clone_div"],
+    expectedSignature: "Divergência Irredutível, Efeito Fantasma",
+    stimConfig: { type: 'pulse' as const, amp: 2.0, freq: 0.05, startOffset: 4.0, duration: 3.0, dutyCycle: 1.0, riseTime: 0.5, fallTime: 0.5 }
   }
 ];
 
@@ -565,6 +658,49 @@ export default function LabCore({ explorationMode = 'guided', setExplorationMode
   const [stimType, setStimType] = useState<StimulusType>('sine');
   const [amp, setAmp] = useState(1.0);
   const [freq, setFreq] = useState(0.12);
+  const [stimStartOffset, setStimStartOffset] = useState(5.0);
+  const [stimDuration, setStimDuration] = useState(0.3);
+
+  // Advanced parameters for stimulus v2 configuration
+  const [stimAttack, setStimAttack] = useState<number>(0.0);
+  const [stimDecay, setStimDecay] = useState<number>(0.0);
+  const [stimSustain, setStimSustain] = useState<number>(1.0);
+  const [stimRelease, setStimRelease] = useState<number>(0.0);
+  const [stimAmFreq, setStimAmFreq] = useState<number>(0.0);
+  const [stimAmDepth, setStimAmDepth] = useState<number>(0.0);
+  const [stimFmFreq, setStimFmFreq] = useState<number>(0.0);
+  const [stimFmDepth, setStimFmDepth] = useState<number>(0.0);
+  const [stimNoiseColor, setStimNoiseColor] = useState<'white' | 'pink' | 'red'>('white');
+  const [stimDutyCycle, setStimDutyCycle] = useState<number>(0.2);
+  const [stimRiseTime, setStimRiseTime] = useState<number>(0.0);
+  const [stimFallTime, setStimFallTime] = useState<number>(0.0);
+
+  const activeStimConfig = useMemo(() => {
+    return {
+      type: stimType === 'thermal_noise' ? 'noise' : (stimType as any),
+      amp,
+      freq,
+      startOffset: stimStartOffset,
+      duration: stimDuration,
+      attack: stimAttack,
+      decay: stimDecay,
+      sustain: stimSustain,
+      release: stimRelease,
+      amFreq: stimAmFreq,
+      amDepth: stimAmDepth,
+      fmFreq: stimFmFreq,
+      fmDepth: stimFmDepth,
+      noiseColor: stimNoiseColor,
+      dutyCycle: stimDutyCycle,
+      riseTime: stimRiseTime,
+      fallTime: stimFallTime,
+    };
+  }, [
+    stimType, amp, freq, stimStartOffset, stimDuration,
+    stimAttack, stimDecay, stimSustain, stimRelease,
+    stimAmFreq, stimAmDepth, stimFmFreq, stimFmDepth,
+    stimNoiseColor, stimDutyCycle, stimRiseTime, stimFallTime
+  ]);
 
   // Simulation controls
   const [simDuration, setSimDuration] = useState(30);
@@ -715,8 +851,8 @@ export default function LabCore({ explorationMode = 'guided', setExplorationMode
 
   // Run simulation
   const points = useMemo(() => {
-    return runSimulation(params, stimType, amp, freq, simDuration, timeStep);
-  }, [params, stimType, amp, freq, simDuration, timeStep]);
+    return runSimulation(params, stimType, amp, freq, simDuration, timeStep, [0, 0, 0], stimStartOffset, stimDuration, activeStimConfig);
+  }, [params, stimType, amp, freq, simDuration, timeStep, stimStartOffset, stimDuration, activeStimConfig]);
 
   // Clone Test State
   const [cloneFreqA, setCloneFreqA] = useState(0.05);
@@ -725,9 +861,9 @@ export default function LabCore({ explorationMode = 'guided', setExplorationMode
 
   useEffect(() => {
     // Run clone test automatically on parameters of clone change
-    const results = runCloneTest(params, stimType, amp, freq, cloneFreqA, cloneFreqB, timeStep);
+    const results = runCloneTest(params, stimType, amp, freq, cloneFreqA, cloneFreqB, timeStep, stimStartOffset, stimDuration, activeStimConfig);
     setCloneResults(results);
-  }, [params, stimType, amp, freq, cloneFreqA, cloneFreqB, timeStep]);
+  }, [params, stimType, amp, freq, cloneFreqA, cloneFreqB, timeStep, stimStartOffset, stimDuration, activeStimConfig]);
 
   // Real-time metrics compute
   const fitResults = useMemo(() => {
@@ -874,7 +1010,21 @@ export default function LabCore({ explorationMode = 'guided', setExplorationMode
       points: [...points],
       stimType,
       amp,
-      freq
+      freq,
+      stimStartOffset,
+      stimDuration,
+      stimAttack,
+      stimDecay,
+      stimSustain,
+      stimRelease,
+      stimAmFreq,
+      stimAmDepth,
+      stimFmFreq,
+      stimFmDepth,
+      stimNoiseColor,
+      stimDutyCycle,
+      stimRiseTime,
+      stimFallTime,
     };
 
     const updated = [newSnap, ...savedSnapshots];
@@ -1838,6 +1988,207 @@ export default function LabCore({ explorationMode = 'guided', setExplorationMode
                 />
               </div>
             </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <div className="flex flex-col gap-0.5 text-[10px]">
+                <span className="text-zinc-400 font-mono">Início do Pulso (s)</span>
+                <input
+                  type="number"
+                  id="stim-startOffset-input"
+                  value={stimStartOffset}
+                  step={0.1}
+                  onChange={(e) => setStimStartOffset(parseFloat(e.target.value) || 0)}
+                  className="w-full px-1.5 py-0.5 bg-slate-900 border border-slate-800 rounded text-slate-300 font-mono"
+                />
+              </div>
+              <div className="flex flex-col gap-0.5 text-[10px]">
+                <span className="text-zinc-400 font-mono">Duração do Pulso (s)</span>
+                <input
+                  type="number"
+                  id="stim-duration-input"
+                  value={stimDuration}
+                  step={0.1}
+                  onChange={(e) => setStimDuration(parseFloat(e.target.value) || 0)}
+                  className="w-full px-1.5 py-0.5 bg-slate-900 border border-slate-800 rounded text-slate-300 font-mono"
+                />
+              </div>
+            </div>
+
+            {/* Parâmetros Avançados E(t) v2 */}
+            <div className="mt-1 border-t border-slate-850 pt-2 flex flex-col gap-2">
+              <span className="text-[9px] text-violet-400 font-mono font-bold uppercase flex items-center gap-1">
+                ⚙️ CONTROLES AVANÇADOS E(t) v2
+              </span>
+
+              {/* Envelope ADSR */}
+              <div className="bg-slate-900/20 p-2 border border-slate-850 rounded flex flex-col gap-1">
+                <span className="text-[8px] font-mono text-zinc-500 uppercase tracking-wider font-bold">
+                  📈 ENVELOPE AMORTECEDOR ADSR
+                </span>
+                <div className="grid grid-cols-4 gap-1">
+                  <div className="flex flex-col gap-0.5 text-[8px]">
+                    <span className="text-zinc-500 font-mono truncate" title="Attack: Tempo de crescimento inicial em segundos">Ataque (s)</span>
+                    <input
+                      type="number"
+                      value={stimAttack}
+                      step={0.1}
+                      onChange={(e) => setStimAttack(Math.max(0, parseFloat(e.target.value) || 0))}
+                      className="w-full px-1 py-0.5 bg-slate-950 border border-slate-850 rounded text-slate-300 font-mono text-[9px]"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-0.5 text-[8px]">
+                    <span className="text-zinc-500 font-mono truncate" title="Decay: Tempo de queda após o pico inicial">Decaimento (s)</span>
+                    <input
+                      type="number"
+                      value={stimDecay}
+                      step={0.1}
+                      onChange={(e) => setStimDecay(Math.max(0, parseFloat(e.target.value) || 0))}
+                      className="w-full px-1 py-0.5 bg-slate-950 border border-slate-850 rounded text-slate-300 font-mono text-[9px]"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-0.5 text-[8px]">
+                    <span className="text-zinc-500 font-mono truncate" title="Sustain: Fração da amplitude mantida durante o sinal (0 a 1)">Sustent (0-1)</span>
+                    <input
+                      type="number"
+                      value={stimSustain}
+                      step={0.1}
+                      min={0}
+                      max={1}
+                      onChange={(e) => setStimSustain(Math.max(0, Math.min(1, parseFloat(e.target.value) || 0)))}
+                      className="w-full px-1 py-0.5 bg-slate-950 border border-slate-850 rounded text-slate-300 font-mono text-[9px]"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-0.5 text-[8px]">
+                    <span className="text-zinc-500 font-mono truncate" title="Release: Tempo de decaimento final em liberação">Liberação (s)</span>
+                    <input
+                      type="number"
+                      value={stimRelease}
+                      step={0.1}
+                      onChange={(e) => setStimRelease(Math.max(0, parseFloat(e.target.value) || 0))}
+                      className="w-full px-1 py-0.5 bg-slate-950 border border-slate-850 rounded text-slate-300 font-mono text-[9px]"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Modulação AM & FM */}
+              <div className="bg-slate-900/20 p-2 border border-slate-850 rounded flex flex-col gap-1">
+                <span className="text-[8px] font-mono text-zinc-500 uppercase tracking-wider font-bold">
+                  🔀 MODULAÇÃO FÁSICA AM E FM
+                </span>
+                <div className="grid grid-cols-4 gap-1">
+                  <div className="flex flex-col gap-0.5 text-[8px]">
+                    <span className="text-zinc-500 font-mono truncate" title="AM Freq: Frequência da modulação de amplitude">Freq AM (Hz)</span>
+                    <input
+                      type="number"
+                      value={stimAmFreq}
+                      step={0.01}
+                      onChange={(e) => setStimAmFreq(Math.max(0, parseFloat(e.target.value) || 0))}
+                      className="w-full px-1 py-0.5 bg-slate-950 border border-slate-850 rounded text-slate-300 font-mono text-[9px]"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-0.5 text-[8px]">
+                    <span className="text-zinc-500 font-mono truncate" title="AM Depth: Profundidade do envelope AM (0 a 1)">Prof AM (0-1)</span>
+                    <input
+                      type="number"
+                      value={stimAmDepth}
+                      step={0.05}
+                      min={0}
+                      max={1}
+                      onChange={(e) => setStimAmDepth(Math.max(0, Math.min(1, parseFloat(e.target.value) || 0)))}
+                      className="w-full px-1 py-0.5 bg-slate-950 border border-slate-850 rounded text-slate-300 font-mono text-[9px]"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-0.5 text-[8px]">
+                    <span className="text-zinc-500 font-mono truncate" title="FM Freq: Frequência da modulação de frequência">Freq FM (Hz)</span>
+                    <input
+                      type="number"
+                      value={stimFmFreq}
+                      step={0.01}
+                      onChange={(e) => setStimFmFreq(Math.max(0, parseFloat(e.target.value) || 0))}
+                      className="w-full px-1 py-0.5 bg-slate-950 border border-slate-850 rounded text-slate-300 font-mono text-[9px]"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-0.5 text-[8px]">
+                    <span className="text-zinc-500 font-mono truncate" title="FM Depth: Desvio de frequência gerado pelo modulador">Prof FM (Hz)</span>
+                    <input
+                      type="number"
+                      value={stimFmDepth}
+                      step={0.05}
+                      onChange={(e) => setStimFmDepth(Math.max(0, parseFloat(e.target.value) || 0))}
+                      className="w-full px-1 py-0.5 bg-slate-950 border border-slate-850 rounded text-slate-300 font-mono text-[9px]"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Formatação Específica White/Pink Noise ou Pulse */}
+              {(stimType === 'thermal_noise' || stimType === 'pulse') && (
+                <div className="bg-slate-900/20 p-2 border border-slate-850 rounded flex flex-col gap-1">
+                  <span className="text-[8px] font-mono text-zinc-500 uppercase tracking-wider font-bold">
+                    {stimType === 'thermal_noise' ? '🎨 ESPECTRO DE CORES DO RUÍDO' : '📐 CONFORMAÇÃO DO PULSO (TRAPEZOIDAL)'}
+                  </span>
+                  
+                  {stimType === 'thermal_noise' && (
+                    <div className="flex gap-2 justify-between items-center text-[9px] mt-0.5">
+                      <span className="text-zinc-400 font-mono">Cor do Ruído:</span>
+                      <div className="flex gap-1">
+                        {(['white', 'pink', 'red'] as const).map((color) => (
+                          <button
+                            key={color}
+                            onClick={() => setStimNoiseColor(color)}
+                            className={`px-1.5 py-0.5 rounded text-[8px] font-mono font-bold uppercase transition ${
+                              stimNoiseColor === color
+                                ? 'bg-cyan-600 text-white'
+                                : 'bg-slate-950 hover:bg-slate-800 text-slate-400 border border-slate-850'
+                            }`}
+                          >
+                            {color === 'white' ? 'Branco' : color === 'pink' ? 'Rosa' : 'Vermelho'}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {stimType === 'pulse' && (
+                    <div className="grid grid-cols-3 gap-1 mt-0.5">
+                      <div className="flex flex-col gap-0.5 text-[8px]">
+                        <span className="text-zinc-500 font-mono truncate" title="Duty Cycle: Razão ativa do pulso periódico (0 a 1)">Duty Cycle (0-1)</span>
+                        <input
+                          type="number"
+                          value={stimDutyCycle}
+                          step={0.05}
+                          min={0}
+                          max={1}
+                          onChange={(e) => setStimDutyCycle(Math.max(0, Math.min(1, parseFloat(e.target.value) || 0)))}
+                          className="w-full px-1 py-0.5 bg-slate-950 border border-slate-850 rounded text-slate-300 font-mono text-[9px]"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-0.5 text-[8px]">
+                        <span className="text-zinc-500 font-mono truncate" title="Rise Time: Suavização exponencial da subida do pulso">Subida Tr (s)</span>
+                        <input
+                          type="number"
+                          value={stimRiseTime}
+                          step={0.05}
+                          onChange={(e) => setStimRiseTime(Math.max(0, parseFloat(e.target.value) || 0))}
+                          className="w-full px-1 py-0.5 bg-slate-950 border border-slate-850 rounded text-slate-300 font-mono text-[9px]"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-0.5 text-[8px]">
+                        <span className="text-zinc-500 font-mono truncate" title="Fall Time: Suavização exponencial da descida do pulso">Descida Tf (s)</span>
+                        <input
+                          type="number"
+                          value={stimFallTime}
+                          step={0.05}
+                          onChange={(e) => setStimFallTime(Math.max(0, parseFloat(e.target.value) || 0))}
+                          className="w-full px-1 py-0.5 bg-slate-950 border border-slate-850 rounded text-slate-300 font-mono text-[9px]"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -1854,17 +2205,18 @@ export default function LabCore({ explorationMode = 'guided', setExplorationMode
                 <h2 className="text-xs font-bold text-slate-100 font-display uppercase tracking-wide mt-0.5">Scenários Científicos Pré-definidos</h2>
               </div>
               <div className="text-[10px] font-mono text-zinc-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-850">
-                Cenário Ativo: <strong className="text-violet-400 font-bold">#{cognitiveStage} / 12</strong>
+                Cenário Ativo: <strong className="text-violet-400 font-bold">#{cognitiveStage} / 17</strong>
               </div>
             </div>
 
             {/* Tier Selectors */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5 p-1 bg-slate-950 rounded-lg border border-slate-850">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-1.5 p-1 bg-slate-950 rounded-lg border border-slate-850">
               {[
                 { id: 1, label: "T1: Entender Memória" },
                 { id: 2, label: "T2: Historicidade" },
                 { id: 3, label: "T3: Não-Localidade" },
                 { id: 4, label: "T4: Limite Teórico" },
+                { id: 5, label: "T5: Sinais v2" },
               ].map((t) => {
                 const isActive = selectedScenarioTier === t.id;
                 return (
@@ -1973,6 +2325,44 @@ export default function LabCore({ explorationMode = 'guided', setExplorationMode
                         setStimType(activeStage.stimType);
                         setAmp(activeStage.amp);
                         setFreq(activeStage.freq);
+                        
+                        // Set startOffset and duration if they exist, or default them
+                        const startOff = (activeStage as any).stimStartOffset !== undefined ? (activeStage as any).stimStartOffset : 5.0;
+                        const dur = (activeStage as any).stimDuration !== undefined ? (activeStage as any).stimDuration : 0.3;
+                        setStimStartOffset(startOff);
+                        setStimDuration(dur);
+
+                        // Load advanced V2 config if present, or reset to defaults
+                        const cfg = (activeStage as any).stimConfig;
+                        if (cfg) {
+                          setStimAttack(cfg.attack || 0.0);
+                          setStimDecay(cfg.decay || 0.0);
+                          setStimSustain(cfg.sustain !== undefined ? cfg.sustain : 1.0);
+                          setStimRelease(cfg.release || 0.0);
+                          setStimAmFreq(cfg.amFreq || 0.0);
+                          setStimAmDepth(cfg.amDepth || 0.0);
+                          setStimFmFreq(cfg.fmFreq || 0.0);
+                          setStimFmDepth(cfg.fmDepth || 0.0);
+                          setStimNoiseColor(cfg.noiseColor || 'white');
+                          setStimDutyCycle(cfg.dutyCycle !== undefined ? cfg.dutyCycle : 0.2);
+                          setStimRiseTime(cfg.riseTime || 0.0);
+                          setStimFallTime(cfg.fallTime || 0.0);
+                        } else {
+                          // Clean reset to simple presets defaults
+                          setStimAttack(0.0);
+                          setStimDecay(0.0);
+                          setStimSustain(1.0);
+                          setStimRelease(0.0);
+                          setStimAmFreq(0.0);
+                          setStimAmDepth(0.0);
+                          setStimFmFreq(0.0);
+                          setStimFmDepth(0.0);
+                          setStimNoiseColor('white');
+                          setStimDutyCycle(0.2);
+                          setStimRiseTime(0.0);
+                          setStimFallTime(0.0);
+                        }
+                        
                         logCurrentRun();
                       }}
                       className="w-full mt-3 py-2 bg-violet-600 hover:bg-violet-500 rounded text-slate-100 font-mono text-[9px] font-bold tracking-wider uppercase cursor-pointer transition text-center shadow-lg shadow-violet-950/20"
@@ -2091,6 +2481,23 @@ export default function LabCore({ explorationMode = 'guided', setExplorationMode
                                     setStimType(snap.stimType);
                                     setAmp(snap.amp);
                                     setFreq(snap.freq);
+                                    
+                                    const s = snap as any;
+                                    setStimStartOffset(s.stimStartOffset !== undefined ? s.stimStartOffset : 5.0);
+                                    setStimDuration(s.stimDuration !== undefined ? s.stimDuration : 0.3);
+                                    setStimAttack(s.stimAttack !== undefined ? s.stimAttack : 0.0);
+                                    setStimDecay(s.stimDecay !== undefined ? s.stimDecay : 0.0);
+                                    setStimSustain(s.stimSustain !== undefined ? s.stimSustain : 1.0);
+                                    setStimRelease(s.stimRelease !== undefined ? s.stimRelease : 0.0);
+                                    setStimAmFreq(s.stimAmFreq !== undefined ? s.stimAmFreq : 0.0);
+                                    setStimAmDepth(s.stimAmDepth !== undefined ? s.stimAmDepth : 0.0);
+                                    setStimFmFreq(s.stimFmFreq !== undefined ? s.stimFmFreq : 0.0);
+                                    setStimFmDepth(s.stimFmDepth !== undefined ? s.stimFmDepth : 0.0);
+                                    setStimNoiseColor(s.stimNoiseColor !== undefined ? s.stimNoiseColor : 'white');
+                                    setStimDutyCycle(s.stimDutyCycle !== undefined ? s.stimDutyCycle : 0.2);
+                                    setStimRiseTime(s.stimRiseTime !== undefined ? s.stimRiseTime : 0.0);
+                                    setStimFallTime(s.stimFallTime !== undefined ? s.stimFallTime : 0.0);
+
                                     logCurrentRun();
                                   }}
                                   title="Recriar parâmetros desta simulação"
