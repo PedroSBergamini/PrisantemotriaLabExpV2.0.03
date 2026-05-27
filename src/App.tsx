@@ -4,16 +4,17 @@
  */
 
 import { useState } from 'react';
-import { Activity, Brain, Server, FolderGit2, BookOpen, Layers, User, Sparkles, Globe, Eye, MessageSquareCode, ShieldCheck } from 'lucide-react';
+import { Activity, Brain, Server, FolderGit2, BookOpen, Layers, User, Sparkles, Globe, Eye, MessageSquareCode, ShieldCheck, Compass } from 'lucide-react';
 import { useI18n } from './i18n';
-import LabCore from './components/LabCore';
-import LabBaselines from './components/LabBaselines';
-import LabReservoir from './components/LabReservoir';
-import LabCompression from './components/LabCompression';
-import LabDocumentation from './components/LabDocumentation';
-import ValidationPanel from './components/ValidationPanel';
+import LabCore from './components/exploration/LabCore';
+import LabBaselines from './components/exploration/LabBaselines';
+import LabReservoir from './components/exploration/LabReservoir';
+import LabCompression from './components/exploration/LabCompression';
+import LabDocumentation from './components/exploration/LabDocumentation';
+import ValidationPanel from './components/validation/ValidationPanel';
+import InterpretationPanel from './components/interpretation/InterpretationPanel';
 
-type LabTab = 'core' | 'baselines' | 'reservoir' | 'compression' | 'validation' | 'docs';
+type LabTab = 'core' | 'baselines' | 'reservoir' | 'compression' | 'validation' | 'interpretation' | 'docs';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<LabTab>('core');
@@ -191,6 +192,19 @@ export default function App() {
         </button>
 
         <button
+          id="tab-btn-interpretation"
+          onClick={() => setActiveTab('interpretation')}
+          className={`flex items-center gap-2 px-3 py-1.5 text-xs font-mono font-bold rounded-md transition-all duration-150 border ${
+            activeTab === 'interpretation'
+              ? 'bg-indigo-950/45 text-indigo-400 border-indigo-500/30 font-bold'
+              : 'bg-transparent text-slate-400 border-transparent hover:border-slate-805 hover:bg-slate-900/40'
+          }`}
+        >
+          <Compass size={14} />
+          {locale === 'en-US' ? 'Interpretation Layer' : 'Camada de Interpretação'}
+        </button>
+
+        <button
           id="tab-btn-docs"
           onClick={() => setActiveTab('docs')}
           className={`flex items-center gap-2 px-3 py-1.5 text-xs font-mono font-bold rounded-md transition-all duration-150 border ${
@@ -211,6 +225,7 @@ export default function App() {
         {activeTab === 'reservoir' && <LabReservoir />}
         {activeTab === 'compression' && <LabCompression />}
         {activeTab === 'validation' && <ValidationPanel />}
+        {activeTab === 'interpretation' && <InterpretationPanel />}
         {activeTab === 'docs' && <LabDocumentation />}
       </main>
 

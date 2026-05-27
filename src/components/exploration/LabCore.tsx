@@ -3,4 +3,5 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export * from './shared/types/index';
+import LabCore from '../LabCore';
+export default LabCore;
