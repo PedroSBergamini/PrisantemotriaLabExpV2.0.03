@@ -15,6 +15,9 @@ import { noiseRobustnessTest } from '../../validation/tests/noiseRobustness.test
 import { convertResultToCSV, downloadValidationAsset } from '../../validation/export';
 import { runParameterSweep, convertSweepToCSV, SweepPoint } from '../../validation/SweepRunner';
 import { ValidationRunResult } from '../../validation/types';
+import { VALIDATION_PRESETS, ValidationPresetKey } from '../../validation/presets';
+import { EXPLORATION_PRESETS, ExplorationPresetKey } from '../../exploration/presets';
+import { adaptTestWithPreset } from '../../validation/guards/autoStabilize';
 
 export default function ValidationPanel() {
   // Test suite running states
@@ -24,6 +27,52 @@ export default function ValidationPanel() {
   const [failuresCount, setFailuresCount] = useState(0);
   const [testResults, setTestResults] = useState<ValidationRunResult[]>([]);
   const [allExceptions, setAllExceptions] = useState<{ test: string; rep: number; reason: string; timestamp: string }[]>([]);
+
+  // Epistemic Preset State Management
+  const [activePresetType, setActivePresetType] = useState<'validation' | 'exploration'>('validation');
+  const [activePresetKey, setActivePresetKey] = useState<string>('STANDARD');
+  const [valPresetSelect, setValPresetSelect] = useState<string>('STANDARD');
+  const [expPresetSelect, setExpPresetSelect] = useState<string>('NONE');
+
+  const activePreset = useMemo(() => {
+    if (activePresetType === 'validation') {
+      return VALIDATION_PRESETS[activePresetKey as ValidationPresetKey] || VALIDATION_PRESETS.STANDARD;
+    } else {
+      return EXPLORATION_PRESETS[activePresetKey as ExplorationPresetKey] || EXPLORATION_PRESETS.EXTREME;
+    }
+  }, [activePresetType, activePresetKey]);
+
+  const handleSelectValPreset = (val: string) => {
+    if (val === 'NONE') {
+      setValPresetSelect('NONE');
+      if (expPresetSelect === 'NONE') {
+        setValPresetSelect('STANDARD');
+        setActivePresetType('validation');
+        setActivePresetKey('STANDARD');
+      }
+    } else {
+      setValPresetSelect(val);
+      setExpPresetSelect('NONE');
+      setActivePresetType('validation');
+      setActivePresetKey(val);
+    }
+  };
+
+  const handleSelectExpPreset = (val: string) => {
+    if (val === 'NONE') {
+      setExpPresetSelect('NONE');
+      if (valPresetSelect === 'NONE') {
+        setValPresetSelect('STANDARD');
+        setActivePresetType('validation');
+        setActivePresetKey('STANDARD');
+      }
+    } else {
+      setExpPresetSelect(val);
+      setValPresetSelect('NONE');
+      setActivePresetType('exploration');
+      setActivePresetKey(val);
+    }
+  };
 
   // Parameter sweep state
   const [isSweeping, setIsSweeping] = useState(false);
@@ -51,7 +100,8 @@ export default function ValidationPanel() {
       setCurrentTestName(test.name);
       setProgress(Math.floor((idx / testsList.length) * 100));
 
-      const res = await runValidationTest(test);
+      const { adaptedTest, warnings } = adaptTestWithPreset(test, activePreset);
+      const res = await runValidationTest(adaptedTest, activePreset, warnings);
       results.push(res);
 
       if (res.failures.length > 0) {
@@ -174,7 +224,7 @@ export default function ValidationPanel() {
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex-1">
           <h2 className="text-lg font-bold text-slate-100 font-display flex items-center gap-2">
-            🧪 Painel de Validação Científica v2.1
+            🧪 Painel de Validação Científica v2.2.1-Freeze
           </h2>
           <p className="text-xs text-zinc-400 mt-1 max-w-2xl leading-relaxed">
             Estrutura unificada de testes falsificáveis de dinâmica não-linear e memória profunda. 
@@ -196,6 +246,73 @@ export default function ValidationPanel() {
             {isRunning ? 'Validando...' : 'Rodar Suite Básica'}
           </button>
         </div>
+      </div>
+
+      {/* Epistemic Presets Panel */}
+      <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex flex-col gap-1.5">
+            <span className="text-xs font-bold text-slate-200 font-display uppercase tracking-wide flex items-center gap-1.5">
+              <Layers size={13} className="text-violet-400" /> Presets de Simulação e Controle
+            </span>
+            <p className="text-[11px] text-zinc-400 font-mono">
+              Selecione presets científicos conservadores ou regimes experimentais exploratórios.
+            </p>
+          </div>
+          
+          <div className="flex flex-wrap gap-3 w-full sm:w-auto">
+            <div className="flex flex-col gap-1 w-full sm:w-48">
+              <label className="text-[9px] font-mono font-bold text-zinc-500 uppercase">Validação (Científico)</label>
+              <select
+                value={valPresetSelect}
+                onChange={(e) => handleSelectValPreset(e.target.value)}
+                className="bg-slate-950 border border-slate-800 text-slate-200 text-xs rounded p-1.5 font-mono outline-none focus:border-violet-600 transition"
+                id="validation-preset-select"
+              >
+                <option value="STANDARD">Standard Validation</option>
+                <option value="ENHANCED">Enhanced Persistence</option>
+                <option value="STRESS">STRESS (High-Memory)</option>
+                <option value="NONE">Desativado</option>
+              </select>
+            </div>
+
+            <div className="flex flex-col gap-1 w-full sm:w-48">
+              <label className="text-[9px] font-mono font-bold text-zinc-500 uppercase">Exploração (Ilustrativo)</label>
+              <select
+                value={expPresetSelect}
+                onChange={(e) => handleSelectExpPreset(e.target.value)}
+                className="bg-slate-950 border border-slate-800 text-slate-200 text-xs rounded p-1.5 font-mono outline-none focus:border-violet-600 transition"
+                id="exploration-preset-select"
+              >
+                <option value="NONE">Desativado</option>
+                <option value="EXTREME">Extreme Persistence</option>
+                <option value="TRAUMA">Trauma Saturation</option>
+                <option value="NOISE">Noise Robustness</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Dynamic Alerts */}
+        {activePresetType === 'validation' && activePresetKey === 'STRESS' && (
+          <div className="bg-amber-950/20 border border-amber-900/50 text-amber-300 p-3 rounded-lg text-xs leading-relaxed font-mono flex items-center justify-between gap-3 animate-fade-in" id="stress-preset-warning-badge">
+            <div className="flex items-center gap-2">
+              <ShieldAlert size={14} className="text-amber-500 shrink-0" />
+              <span><strong>⚠️ HIGH-MEMORY REGIME:</strong> regime de persistência estendida instável. Fora das margens do modelo físico padrão.</span>
+            </div>
+            <span className="bg-amber-900/40 text-amber-400 border border-amber-800/40 rounded px-2 py-0.5 text-[8px] font-bold uppercase shrink-0">⚠️ HIGH-MEMORY REGIME</span>
+          </div>
+        )}
+
+        {activePresetType === 'exploration' && (
+          <div className="bg-red-950/20 border border-red-900/50 text-red-200 p-3 rounded-lg text-xs leading-relaxed font-mono flex items-start gap-2 animate-fade-in" id="exploration-mode-banner">
+            <ShieldAlert size={14} className="text-red-500 mt-0.5 shrink-0" />
+            <div>
+              <strong className="text-red-400 block uppercase tracking-wide">EXPLORATORY MODE Not for scientific claims</strong>
+              Simulação de limites não-lineares extremos ({activePreset.name}). Não deve ser usado como evidência científica de persistência de memória.
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Progress status bar */}
@@ -257,6 +374,14 @@ export default function ValidationPanel() {
                       <span>•</span>
                       <span>Passes: <strong>{res.metadata.repetitions - res.failures.length}/{res.metadata.repetitions}</strong></span>
                     </div>
+                    {res.metadata.warnings && res.metadata.warnings.length > 0 && (
+                      <div className="mt-2 bg-amber-950/10 border border-amber-900/35 rounded p-2 text-[9px] font-mono text-amber-300">
+                        <strong className="text-amber-500 block text-[8px] uppercase tracking-wide mb-0.5">⚠️ Segurança Ativa (Estabilização):</strong>
+                        <ul className="list-disc list-inside space-y-0.5">
+                          {res.metadata.warnings.map((w, index) => <li key={index}>{w}</li>)}
+                        </ul>
+                      </div>
+                    )}
                   </div>
 
                   {/* Export Trigger items */}
@@ -303,7 +428,7 @@ export default function ValidationPanel() {
                             <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold ${
                               m.passed ? 'bg-emerald-950/40 text-emerald-400 border border-emerald-900/30' : 'bg-red-950/40 text-red-400 border border-red-900/30'
                             }`}>
-                              {m.passed ? 'APROVADO' : 'REJEITADO'}
+                              {m.passed ? 'PRELIMINARY_PASS' : 'FAIL'}
                             </span>
                           </td>
                         </tr>

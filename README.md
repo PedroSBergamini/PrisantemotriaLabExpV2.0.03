@@ -217,5 +217,17 @@ Acts as an explicability server, converting abstract differential metric values 
 | **Divergence $D \ge 0.1$, $\Phi \ge 0.15$, with severe $k^*$ peaks** | History-dependence is non-Markovian, non-local, and geometrically irredutible. | **Strongly Validated**. The state requires an explicit historical degree of freedom. |
 
 ---
-**README compiled and validated for Prisantemotria Lab v2.2 Standards.**  
+
+## 8. Epistemic Separation & Scientific Freeze (Patch v2.2.1)
+
+To protect the integrity of scientific assertions made using this framework, **Patch v2.2.1-Freeze** enforces a strict separation between *validation mechanics* (rigorous, deterministic, and bounded) and *exploration modes* (experimental, illustrative, and phenomenological).
+
+### 8.1 Guidelines for Scientific Use
+*   **Validation Layer Isolation**: No validation modules (`validation/`) are permitted to import structures from exploration blocks (`exploration/`). Validation remains fully self-governing.
+*   **Frozen Differential Dynamics**: No silent clamping or dynamical deviations are introduced in the evaluation pipeline. Raw physical dynamics are calculated with zero distortion.
+*   **1σ Preliminary Pass Criteria**: Pass metrics are evaluated under a highly conservative $1\sigma$ uncertainty profile, returning an explicit `PRELIMINARY_PASS` or `FAIL` status rather than claiming absolute metaphysical proof.
+*   **Explicit Epistemic Metadata**: All CSV/JSON file exports are automatically tagged with their complete environmental signature, including preset mode, active auto-stabilization warnings, and the strict warning header: *"This framework does not claim consciousness, metaphysics, or new physics; it provides reproducible instrumentation for studying trajectory-dependent persistence in nonlinear systems with explicit historical memory terms."*
+
+---
+**README compiled and validated for Prisantemotria Lab v2.2.1-Freeze Standards.**  
 *Predictable, explicable, and stable open-source non-linear systems modeling.*

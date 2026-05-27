@@ -37,6 +37,11 @@ export interface ValidationMetadata {
   dt: number;
   seed_base: number;
   repetitions: number;
+  epistemic_mode?: string;
+  not_for_claims?: boolean;
+  pass_criterion?: string;
+  validation_layer_version?: string;
+  warnings?: string[];
 }
 
 export interface ValidationRunResult {

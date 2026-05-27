@@ -12,15 +12,21 @@ export function convertResultToCSV(result: ValidationRunResult): string {
   const lines: string[] = [];
 
   // Metadata Section
-  lines.push(`"Scientific Validation Report","Prisantemotria Lab v2.1"`);
+  lines.push(`"Scientific Validation Report","Prisantemotria Lab v2.2.1"`);
   lines.push(`"Test Identifier","${result.id}"`);
   lines.push(`"Test Class Title","${result.name}"`);
   lines.push(`"Report Timestamp","${result.metadata.timestamp}"`);
-  lines.push(`"Framework Version","${result.metadata.version}"`);
+  lines.push(`"Framework Version","${result.metadata.validation_layer_version || 'v2.2.1'}"`);
   lines.push(`"ODE Integrator","${result.metadata.solver}"`);
   lines.push(`"Delta-T (s)","${result.metadata.dt}"`);
   lines.push(`"Randomizer Base Seed","${result.metadata.seed_base}"`);
   lines.push(`"Deterministic Replications","${result.metadata.repetitions}"`);
+  lines.push(`"Epistemic Mode","${result.metadata.epistemic_mode || 'validation'}"`);
+  lines.push(`"Not For Claims","${Boolean(result.metadata.not_for_claims)}"`);
+  lines.push(`"Pass Criterion","${result.metadata.pass_criterion || 'PRELIMINARY_1SIGMA'}"`);
+  if (result.metadata.warnings && result.metadata.warnings.length > 0) {
+    lines.push(`"Execution Warnings","${result.metadata.warnings.join('; ').replace(/"/g, '""')}"`);
+  }
   lines.push('');
 
   // Metrics Table Header
@@ -28,7 +34,7 @@ export function convertResultToCSV(result: ValidationRunResult): string {
 
   // Metrics Rows
   for (const m of result.metrics) {
-    lines.push(`"${m.metric}",${m.control_mean},${m.control_std},${m.experimental_mean},${m.experimental_std},${m.delta_percent},"${m.passed ? 'PASSED' : 'FAILED'}"`);
+    lines.push(`"${m.metric}",${m.control_mean},${m.control_std},${m.experimental_mean},${m.experimental_std},${m.delta_percent},"${m.passed ? 'PRELIMINARY_PASS' : 'FAIL'}"`);
   }
 
   lines.push('');

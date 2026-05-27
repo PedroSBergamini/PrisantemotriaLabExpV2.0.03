@@ -51,7 +51,13 @@ function executeSimulation(config: SimulationConfig, initialY?: [number, number,
 /**
  * Executes one scientific validation test and returns its aggregated metrics.
  */
-export async function runValidationTest(test: ValidationTest): Promise<ValidationRunResult> {
+export async function runValidationTest(
+  test: ValidationTest,
+  preset?: any,
+  presetWarnings: string[] = [],
+  signal?: AbortSignal,
+  onRepComplete?: (repCount: number) => void
+): Promise<ValidationRunResult> {
   const repetitions = test.repetitions || 5;
   const seedBase = test.seed_base || 100;
   const failures: FailureEvent[] = [];
@@ -74,6 +80,9 @@ export async function runValidationTest(test: ValidationTest): Promise<Validatio
   const rawRuns: any[] = [];
 
   for (let rep = 0; rep < repetitions; rep++) {
+    if (signal?.aborted) {
+      throw new Error('Simulation aborted');
+    }
     const seed = seedBase + rep;
     const rand = seededRandom(seed);
 
@@ -203,6 +212,13 @@ export async function runValidationTest(test: ValidationTest): Promise<Validatio
         timestamp: new Date().toISOString()
       });
     }
+
+    onRepComplete?.(rep + 1);
+
+    // Yield control back to main thread periodically to keep UI responsive
+    if (rep % 5 === 0) {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    }
   }
 
   // Aggregate stats across passing repetitions
@@ -255,7 +271,12 @@ export async function runValidationTest(test: ValidationTest): Promise<Validatio
       solver: 'RK4',
       dt: test.setup.dt || 0.05,
       seed_base: seedBase,
-      repetitions
+      repetitions,
+      epistemic_mode: preset?.epistemic_mode || 'validation',
+      not_for_claims: Boolean(preset?.not_for_claims),
+      pass_criterion: 'PRELIMINARY_1SIGMA',
+      validation_layer_version: 'v2.2.1',
+      warnings: presetWarnings
     },
     metrics: validationMetrics,
     raw_runs: rawRuns,
