@@ -4,15 +4,16 @@
  */
 
 import { useState } from 'react';
-import { Activity, Brain, Server, FolderGit2, BookOpen, Layers, User, Sparkles, Globe, Eye, MessageSquareCode } from 'lucide-react';
+import { Activity, Brain, Server, FolderGit2, BookOpen, Layers, User, Sparkles, Globe, Eye, MessageSquareCode, ShieldCheck } from 'lucide-react';
 import { useI18n } from './i18n';
 import LabCore from './components/LabCore';
 import LabBaselines from './components/LabBaselines';
 import LabReservoir from './components/LabReservoir';
 import LabCompression from './components/LabCompression';
 import LabDocumentation from './components/LabDocumentation';
+import ValidationPanel from './components/ValidationPanel';
 
-type LabTab = 'core' | 'baselines' | 'reservoir' | 'compression' | 'docs';
+type LabTab = 'core' | 'baselines' | 'reservoir' | 'compression' | 'validation' | 'docs';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<LabTab>('core');
@@ -177,6 +178,19 @@ export default function App() {
         </button>
 
         <button
+          id="tab-btn-validation"
+          onClick={() => setActiveTab('validation')}
+          className={`flex items-center gap-2 px-3 py-1.5 text-xs font-mono font-bold rounded-md transition-all duration-150 border ${
+            activeTab === 'validation'
+              ? 'bg-fuchsia-950/40 text-fuchsia-400 border-fuchsia-500/30'
+              : 'bg-transparent text-slate-400 border-transparent hover:border-slate-805 hover:bg-slate-900/40'
+          }`}
+        >
+          <ShieldCheck size={14} />
+          {locale === 'en-US' ? 'Validation Suite' : 'Suite de Validação'}
+        </button>
+
+        <button
           id="tab-btn-docs"
           onClick={() => setActiveTab('docs')}
           className={`flex items-center gap-2 px-3 py-1.5 text-xs font-mono font-bold rounded-md transition-all duration-150 border ${
@@ -196,6 +210,7 @@ export default function App() {
         {activeTab === 'baselines' && <LabBaselines />}
         {activeTab === 'reservoir' && <LabReservoir />}
         {activeTab === 'compression' && <LabCompression />}
+        {activeTab === 'validation' && <ValidationPanel />}
         {activeTab === 'docs' && <LabDocumentation />}
       </main>
 

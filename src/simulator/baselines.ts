@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { SimulationPoint, BaselineMetrics, PredictionBenchmarkResult } from '../types';
+import { SimulationPoint, BaselineMetrics, PredictionBenchmarkResult, SystemParameters, StimulusType } from '../types';
+import { runSimulation } from './ode';
 
 // Matrix transposition
 function transpose(A: number[][]): number[][] {
@@ -256,4 +257,67 @@ export function findMinimumEmbeddingDimension(
     }
   }
   return matchedOrder;
+}
+
+/**
+ * Baseline 1: Markovian Baseline
+ * H(t) completely decoupled from S(t) by forcing beta = 0.
+ */
+export function simulateMarkovianBaseline(
+  par: SystemParameters,
+  stimType: StimulusType,
+  amp: number,
+  freq: number,
+  duration: number = 30,
+  dt: number = 0.05,
+  initialY: [number, number, number] = [0, 0, 0],
+  startOffset?: number,
+  stimDuration?: number,
+  stimConfig?: any
+): SimulationPoint[] {
+  const markovParams: SystemParameters = { ...par, beta: 0 };
+  return runSimulation(markovParams, stimType, amp, freq, duration, dt, initialY, startOffset, stimDuration, stimConfig);
+}
+
+/**
+ * Baseline 2: Linear Oscillator Baseline
+ * Eliminates double-well potential and resolves a simple harmonic single well.
+ */
+export function simulateLinearOscillatorBaseline(
+  par: SystemParameters,
+  stimType: StimulusType,
+  amp: number,
+  freq: number,
+  duration: number = 30,
+  dt: number = 0.05,
+  initialY: [number, number, number] = [0, 0, 0],
+  startOffset?: number,
+  stimDuration?: number,
+  stimConfig?: any
+): SimulationPoint[] {
+  const linearParams: SystemParameters = { ...par, potential: 'harmonic' as const };
+  return runSimulation(linearParams, stimType, amp, freq, duration, dt, initialY, startOffset, stimDuration, stimConfig);
+}
+
+/**
+ * Baseline 3: Simple Backlash Hysteresis
+ * Traditional backlash play hysteresis model.
+ */
+export function simulateSimpleHysteresisBaseline(
+  E_series: number[],
+  times: number[],
+  backlash: number = 0.5
+): number[] {
+  const S: number[] = [];
+  let currentS = 0;
+  for (let i = 0; i < E_series.length; i++) {
+    const u = E_series[i];
+    if (u - currentS > backlash) {
+      currentS = u - backlash;
+    } else if (u - currentS < -backlash) {
+      currentS = u + backlash;
+    }
+    S.push(currentS);
+  }
+  return S;
 }
